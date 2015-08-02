@@ -1,6 +1,6 @@
 <?php
-require_once(DIR_SYSTEM.'library/zarinpal_func/sender.php');
-class ControllerPaymentzarinpal extends Controller {
+require_once(DIR_SYSTEM.'library/zarinpal_methods/methods.php');
+class ControllerPaymentPayline extends Controller {
 	public function index() {
 		$this->load->language('payment/zarinpal');
 
@@ -38,18 +38,19 @@ public function confirm() {
 		//$data['Amount']=$data['Amount']\10;
 
 
-		$data['MID']=$this->config->get('zarinpal_MID');
+		$data['MerchantID']=$this->config->get('zarinpal_MerchantID');
 
 
 		$data['ResNum'] = $this->session->data['order_id'];
 
-		//$data['return'] = $this->url->link('checkout/success', '', 'SSL');
-		$data['return'] = HTTPS_SERVER . 'index.php?route=checkout/success';
+		$data['return'] = $this->url->link('checkout/success', '', 'SSL');
+		//$data['return'] = HTTPS_SERVER . 'index.php?route=checkout/success';
 
 		$data['cancel_return'] = $this->url->link('checkout/payment', '', 'SSL');
 		//$data['cancel_return'] = HTTPS_SERVER . 'index.php?route=checkout/payment';
 
 		$data['back'] = $this->url->link('checkout/payment', '', 'SSL');
+
 
 
 		$amount = $data['Amount'];
@@ -59,15 +60,20 @@ public function confirm() {
 
         $data['order_id'] = $encryption->encrypt($this->session->data['order_id']);
 
-		$callbackUrl  =  $this->url->link('payment/zarinpal/callback&order_id=' . $data['order_id'], 'SSL');
+		$callbackUrl  =  urlencode($this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id'], 'SSL'));
 
-        $result = request($data['MID'],$amount,$data['ResNum'],$callbackUrl);
+        $result = Request($data['MerchantID'],$amount,$data['order_id'],$callbackUrl);
+        if($result->Status != 100){
+            $json = array();
+	    	$json['error']= "Can not connect to Payline.<br>";
+
+		    $this->response->setOutput(json_encode($json));
+        }
 
 
+		if($result->Status == 100){
 
-		if($result->Status  ==  100 ){
-
-		$data['action'] = 'https://www.zarinpal.com/pg/StartPay/'.$result->Authority;
+		$data['action'] = "https://www.zarinpal.com/pg/StartPay/" . $result->Authority;
 		$json = array();
 		$json['success']= $data['action'];
 
@@ -75,7 +81,7 @@ public function confirm() {
 
 		} else {
 
-			$this->CheckState($result->Status);
+			$this->CheckState($result->Status );
 			//die();
 		}
 
@@ -88,21 +94,23 @@ public function confirm() {
 	public function CheckState($status) {
 		$json = array();
 
-$json['error']= 'ERR : '.$status ;
+
+
+			$json['error']= "خطای شماره : " . $status ;
+
 
 
 		$this->response->setOutput(json_encode($json));
 
 }
 
-function verify_payment($Authority, $Amount){
+function verify_payment($Authority,$Amount){
 
-    $data['MID'] = $this->config->get('zarinpal_MID');
-
-    $result = Verify($data['MID'],$Authority,$Amount);
+    $data['MerchantID'] = $this->config->get('zarinpal_MerchantID');
+    $result = Verification($data['MerchantID'],$Amount,$Authority);
 	$this->CheckState($result);
 
-	if($result==100)
+	if($result->Status==100)
 		return true;
 
 	else {
@@ -116,10 +124,9 @@ function verify_payment($Authority, $Amount){
 		$this->load->library('encryption');
 
 		$encryption = new Encryption($this->config->get('config_encryption'));
-
         $Authority = $_GET['Authority'];
 		$order_id = $encryption->decrypt($this->request->get['order_id']);
-		$MerchantID=$this->config->get('zarinpal_MID');
+		$MerchantID=$this->config->get('zarinpal_MerchantID');
 		$debugmod=false;
 
 		$this->load->model('checkout/order');
@@ -130,8 +137,8 @@ function verify_payment($Authority, $Amount){
 		$amount = $Amount/$order_info['currency_value'];
 
 		if ($order_info) {
-			if(($this->verify_payment($Authority, $amount)) ) {
-			$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('zarinpal_order_status_id'),'شماره رسيد ديجيتالي; Authority: '.$Authority);
+			if(($this->verify_payment($Authority)) or ($debugmod==true)) {
+			$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('zarinpal_order_status_id'),'شماره رسيد ديجيتالي; Authority: ');
 
 				$this->response->setOutput('<html><head><meta http-equiv="refresh" CONTENT="2; url=' . $this->url->link('checkout/success') . '"></head><body><table border="0" width="100%"><tr><td>&nbsp;</td><td style="border: 1px solid gray; font-family: tahoma; font-size: 14px; direction: rtl; text-align: right;">با تشکر پرداخت تکمیل شد.لطفا چند لحظه صبر کنید و یا  <a href="' . $this->url->link('checkout/success') . '"><b>اینجا کلیک نمایید</b></a></td><td>&nbsp;</td></tr></table></body></html>');
 			}else{
