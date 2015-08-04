@@ -14,7 +14,7 @@
 								)
 		);
 		
-		return $result
+		return $result;
 		}
 		
     }
