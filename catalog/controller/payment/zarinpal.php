@@ -1,6 +1,6 @@
 <?php
 require_once(DIR_SYSTEM.'library/zarinpal_methods/methods.php');
-class ControllerPaymentPayline extends Controller {
+class Controllerpaymentzarinpal extends Controller {
 	public function index() {
 		$this->load->language('payment/zarinpal');
 
