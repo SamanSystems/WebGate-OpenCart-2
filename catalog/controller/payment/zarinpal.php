@@ -62,7 +62,7 @@ public function confirm() {
 
 		$callbackUrl  =  urlencode($this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id'], 'SSL'));
 
-        $result = Request($data['MerchantID'],$amount,$data['order_id'],$callbackUrl);
+        $result = Request($data['MerchantID'],$amount,'پرداحت سفارش شماره : '.$this->session->data['order_id'],$callbackUrl);
         if($result->Status != 100){
             $json = array();
 	    	$json['error']= "Can not connect to zarinpal.<br>";
