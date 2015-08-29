@@ -8,7 +8,7 @@
 									'MerchantID' 	=> $MerchantID,
 									'Amount' 	=> $Amount,
 									'Description' 	=> $Description,
-									'Email' 	=> $Email,
+									'Email' 	=> @$Email,
 									'Mobile' 	=> $Mobile,
 									'CallbackURL' 	=> $CallbackURL
 								)
