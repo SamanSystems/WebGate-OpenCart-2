@@ -65,7 +65,7 @@ public function confirm() {
         $result = Request($data['MerchantID'],$amount,$data['order_id'],$callbackUrl);
         if($result->Status != 100){
             $json = array();
-	    	$json['error']= "Can not connect to Payline.<br>";
+	    	$json['error']= "Can not connect to zarinpal.<br>";
 
 		    $this->response->setOutput(json_encode($json));
         }
