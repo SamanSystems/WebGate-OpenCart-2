@@ -17,7 +17,7 @@
 		return $result;
 		}
 		
-    }
+  
     function get($MerchantID,$Amount,$Authority){
 		// URL also Can be https://ir.zarinpal.com/pg/services/WebGate/wsdl
 		$client = new SoapClient('https://de.zarinpal.com/pg/services/WebGate/wsdl', array('encoding' => 'UTF-8')); 
