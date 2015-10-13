@@ -60,7 +60,7 @@ public function confirm() {
 
         $data['order_id'] = $encryption->encrypt($this->session->data['order_id']);
 
-		$callbackUrl  =  urlencode($this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id'], 'SSL'));
+		$callbackUrl  =  $this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id'], 'SSL');
 
         $result = Request($data['MerchantID'],$amount,'پرداحت سفارش شماره : '.$this->session->data['order_id'],$callbackUrl);
         if($result->Status != 100){
