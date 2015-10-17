@@ -55,12 +55,13 @@ public function confirm() {
 
 		$amount = $data['Amount'];
 		if($this->currency->getCode()!='RLS') {
-		    $amount=$amount * 10;
+		    $amount=$amount * 1;
 	    }
 
         $data['order_id'] = $encryption->encrypt($this->session->data['order_id']);
 
-		$callbackUrl  =  $this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id'], 'SSL');
+	//	$callbackUrl  =  $this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id'], 'SSL');
+		$callbackUrl  =  $this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id']);
 
         $result = Request($data['MerchantID'],$amount,'پرداحت سفارش شماره : '.$this->session->data['order_id'],$callbackUrl);
         if($result->Status != 100){
@@ -134,10 +135,10 @@ function verify_payment($Authority,$Amount){
 
 
 			$Amount = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);		//echo $data['Amount'];
-		$amount = $Amount/$order_info['currency_value'];
+		@$amount = $Amount/$order_info['currency_value'];
 
 		if ($order_info) {
-			if(($this->verify_payment($Authority)) or ($debugmod==true)) {
+			if(($this->verify_payment($Authority,$amount )) or ($debugmod==true)) {
 			$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('zarinpal_order_status_id'),'شماره رسيد ديجيتالي; Authority: ');
 
 				$this->response->setOutput('<html><head><meta http-equiv="refresh" CONTENT="2; url=' . $this->url->link('checkout/success') . '"></head><body><table border="0" width="100%"><tr><td>&nbsp;</td><td style="border: 1px solid gray; font-family: tahoma; font-size: 14px; direction: rtl; text-align: right;">با تشکر پرداخت تکمیل شد.لطفا چند لحظه صبر کنید و یا  <a href="' . $this->url->link('checkout/success') . '"><b>اینجا کلیک نمایید</b></a></td><td>&nbsp;</td></tr></table></body></html>');
