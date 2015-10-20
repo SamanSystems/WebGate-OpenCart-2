@@ -61,14 +61,14 @@ public function confirm() {
         $data['order_id'] = $encryption->encrypt($this->session->data['order_id']);
 
 	//	$callbackUrl  =  $this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id'], 'SSL');
-		$callbackUrl  =  $this->url->link('payment/zarinpal/callback', 'order_id=' . $data['order_id']);
+		$callbackUrl  =  $this->url->link('payment/zarinpal/callback&order_id=' . $data['order_id']);
 
         $result = Request($data['MerchantID'],$amount,'پرداحت سفارش شماره : '.$this->session->data['order_id'],$callbackUrl);
         if($result->Status != 100){
             $json = array();
 	    	$json['error']= "Can not connect to zarinpal.<br>";
 
-		    $this->response->setOutput(json_encode($json));
+		    @$this->response->setOutput(json_encode($json));
         }
 
 
