@@ -97,7 +97,7 @@ public function confirm() {
 
 
 
-			$json['error']= "خطای شماره : " . $status ;
+			$json['error']=  $status ;
 
 
 
