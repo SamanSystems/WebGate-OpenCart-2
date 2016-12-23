@@ -74,7 +74,7 @@ public function confirm() {
 
 		if($result->Status == 100){
 
-		$data['action'] = "https://www.zarinpal.com/pg/StartPay/" . $result->Authority;
+		$data['action'] = "https://www.zarinpal.com/pg/StartPay/" . $result->Authority . "/ZarinGate";
 		$json = array();
 		$json['success']= $data['action'];
 
